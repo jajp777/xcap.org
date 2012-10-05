@@ -106,3 +106,11 @@ UpgradeLog*.XML
 
 # NuGet
 packages/
+
+Assets/UriParsers/BnfToDfa.exe
+Assets/UriParsers/DfaToCSharp.exe
+Assets/UriParsers/Fsm.dll
+Assets/UriParsers/Irony.dll
+Assets/UriParsers/xcap-path.xml
+Assets/UriParsers/Xcap.PathParser.dfa
+Assets/UriParsers/XcapPathParser.cs

@@ -1,0 +1,11 @@
+;@using "rfc4825.bnf"
+
+xcap-path          =  "/" path-a-uid "/" ( path-global / path-users )
+                      [ "/" document-name ]
+
+path-a-uid         =  a-uid / "resource-lists" / "rls-resources"
+path-global        =  "global"
+path-users         =  "users" "/" user-name
+user-name          =  a-uid
+document-name      =  a-uid / "index"
+

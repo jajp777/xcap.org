@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using SocketServers;
 using Http.Message;
+using Xcap.PathParser;
 
 namespace XcapServer
 {
@@ -42,6 +43,7 @@ namespace XcapServer
 			var exePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
 			HttpMessageReader.LoadTables(exePath + @"\Http.Message.dfa");
+			XcapPathParser.LoadTables(exePath);
 
 			/////////////////////////////////////////////////////////////////////////
 
