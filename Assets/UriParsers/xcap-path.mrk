@@ -1,12 +1,10 @@
 
+xcap-path.path-a-uid.a-uid -> Range = Auid;
 
-xcap-path.path-a-uid.resource-lists -> Const = Auid;
-xcap-path.path-a-uid.rls-resources -> Const = Auid;
+xcap-path.path-global.global -> Bool = IsGlobal;
 
-xcap-path.path-global.global -> Const = Usage;
-xcap-path.path-users.users -> Const = Usage;
+xcap-path.path-items.a-uid -> Range = Segment2;
 
-xcap-path.path-users.user-name -> Range = Username;
+xcap-path.path-items.path-item -> Range = Item;
 
-xcap-path.document-name.index -> Const = DocumentNameId;
-xcap-path.document-name -> Range = DocumentName;
+xcap-path.document-name.index -> Range = DocumentName;

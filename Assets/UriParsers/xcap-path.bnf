@@ -1,11 +1,11 @@
 ;@using "rfc4825.bnf"
 
-xcap-path          =  "/" path-a-uid "/" ( path-global / path-users )
+xcap-path          =  "/" path-a-uid "/" ( path-global / path-items )
                       [ "/" document-name ]
 
-path-a-uid         =  a-uid / "resource-lists" / "rls-resources"
+path-a-uid         =  a-uid / "xcap-caps" / "resource-lists" / "rls-resources"
 path-global        =  "global"
-path-users         =  "users" "/" user-name
-user-name          =  a-uid
+path-items         =  a-uid "/" path-item
+path-item          =  *(a-uid-unreserved / ":" / "@" / ".")
 document-name      =  a-uid / "index"
 

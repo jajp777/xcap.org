@@ -14,12 +14,6 @@ namespace XcapServer
 
 		static void Main(string[] args)
 		{
-			xcapServer = new XcapServer();
-
-			xcapServer.SendAsync = SendAsync;
-
-			/////////////////////////////////////////////////////////////////////////
-
 			serversManager = new ServersManager<HttpConnection>(new ServersManagerConfig());
 
 			serversManager.Bind(new ProtocolPort() { Protocol = ServerProtocol.Tcp, Port = 8080, });
@@ -44,6 +38,10 @@ namespace XcapServer
 
 			HttpMessageReader.LoadTables(exePath + @"\Http.Message.dfa");
 			XcapPathParser.LoadTables(exePath);
+
+			/////////////////////////////////////////////////////////////////////////
+
+			xcapServer = new XcapServer(SendAsync);
 
 			/////////////////////////////////////////////////////////////////////////
 
@@ -76,6 +74,8 @@ namespace XcapServer
 			r.AttachBuffer(writer.Detach());
 
 			serversManager.SendAsync(r);
+
+			writer.Dispose();
 		}
 
 		static bool ServersManager_Received(ServersManager<HttpConnection> s, HttpConnection connection, ref ServerAsyncEventArgs e)

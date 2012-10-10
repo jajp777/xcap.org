@@ -47,10 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuidHandlers\BaseAuidHandler.cs" />
+    <Compile Include="XcapErrors.cs" />
+    <Compile Include="AuidHandlers\ResourceListsHandler.cs" />
+    <Compile Include="AuidHandlers\RlsServicesHandler.cs" />
     <Compile Include="BufferManagerProxy.cs" />
     <Compile Include="HttpConnection.cs" />
+    <Compile Include="AuidHandlers\IAuidHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AuidHandlers\XcapCapsHandler.cs" />
     <Compile Include="XcapPathParser.cs" />
     <Compile Include="XcapServer.cs" />
   </ItemGroup>
