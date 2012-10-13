@@ -23,26 +23,36 @@ namespace XcapServer
 
 		public Func<HttpMessageWriter> GetWritter { protected get; set; }
 
-		public abstract HttpMessageWriter ProcessGlobal();
-		public abstract HttpMessageWriter ProcessGetItem(string item);
+		public virtual HttpMessageWriter ProcessGlobal()
+		{
+			return null;
+		}
+
+		public virtual HttpMessageWriter ProcessGetItem(string item)
+		{
+			return null;
+		}
 
 		public virtual HttpMessageWriter ProcessPutItem(string item, ArraySegment<byte> content)
 		{
-			var value = Encoding.UTF8.GetString(content.Array, content.Offset, content.Count);
-
 			return CreateErrorResponse(XcapErrors.CannotInsert, "Not Implemented");
+		}
+
+		public virtual HttpMessageWriter ProcessDeleteItem(string item)
+		{
+			return CreateErrorResponse(XcapErrors.CannotDelete, "Not Implemented");
 		}
 
 		protected HttpMessageWriter CreateErrorResponse(XcapErrors error, string phrase)
 		{
-			return CreateResponse(ContentType.ApplicationXcapErrorXml, CreateErrorContent(XcapErrors.CannotInsert, phrase));
+			return CreateResponse(StatusCodes.Conflict, ContentType.ApplicationXcapErrorXml, CreateErrorContent(XcapErrors.CannotInsert, phrase));
 		}
 
-		protected HttpMessageWriter CreateResponse(ContentType contentType, byte[] content)
+		protected HttpMessageWriter CreateResponse(StatusCodes statusCodes, ContentType contentType, byte[] content)
 		{
 			var writer = GetWritter();
 
-			writer.WriteStatusLine(StatusCodes.OK);
+			writer.WriteStatusLine(statusCodes);
 			writer.WriteContentType(contentType);
 			writer.WriteContentLength(content.Length);
 			writer.WriteCRLF();

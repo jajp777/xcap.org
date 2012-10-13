@@ -76,6 +76,16 @@ const int State30 = 30;
 const int State31 = 31;
 const int State32 = 32;
 const int State33 = 33;
+const int State34 = 34;
+const int State35 = 35;
+const int State36 = 36;
+const int State37 = 37;
+const int State38 = 38;
+const int State39 = 39;
+const int State40 = 40;
+const int State41 = 41;
+const int State42 = 42;
+const int State43 = 43;
 #endregion
 #region States Tables
 private static int[] table0;
@@ -111,6 +121,16 @@ private static int[] table29;
 private static int[] table30;
 private static int[] table31;
 private static int[] table32;
+private static int[] table33;
+private static int[] table34;
+private static int[] table35;
+private static int[] table36;
+private static int[] table37;
+private static int[] table38;
+private static int[] table39;
+private static int[] table40;
+private static int[] table41;
+private static int[] table42;
 #endregion
 #region void LoadTables(..)
 public static void LoadTables()
@@ -223,6 +243,36 @@ Buffer.BlockCopy(buffer, 0, table31, 0, maxBytes);
 table32 = new int[maxItems];
 reader.Read(buffer, 0, buffer.Length);
 Buffer.BlockCopy(buffer, 0, table32, 0, maxBytes);
+table33 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table33, 0, maxBytes);
+table34 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table34, 0, maxBytes);
+table35 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table35, 0, maxBytes);
+table36 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table36, 0, maxBytes);
+table37 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table37, 0, maxBytes);
+table38 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table38, 0, maxBytes);
+table39 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table39, 0, maxBytes);
+table40 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table40, 0, maxBytes);
+table41 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table41, 0, maxBytes);
+table42 = new int[maxItems];
+reader.Read(buffer, 0, buffer.Length);
+Buffer.BlockCopy(buffer, 0, table42, 0, maxBytes);
 }
 }
 #endregion
@@ -358,6 +408,36 @@ case State32:
 state = table32[bytes[i]];
 break;
 case State33:
+state = table33[bytes[i]];
+break;
+case State34:
+state = table34[bytes[i]];
+break;
+case State35:
+state = table35[bytes[i]];
+break;
+case State36:
+state = table36[bytes[i]];
+break;
+case State37:
+state = table37[bytes[i]];
+break;
+case State38:
+state = table38[bytes[i]];
+break;
+case State39:
+state = table39[bytes[i]];
+break;
+case State40:
+state = table40[bytes[i]];
+break;
+case State41:
+state = table41[bytes[i]];
+break;
+case State42:
+state = table42[bytes[i]];
+break;
+case State43:
 Error = true;
 goto exit1;
 }
@@ -371,128 +451,158 @@ case State0:
 state = table0[bytes[i]];
 break;
 case State1:
-if(Auid.Begin < 0)Auid.Begin = i;
 state = table1[bytes[i]];
 break;
 case State2:
-Auid.End = i;
 state = table2[bytes[i]];
 break;
 case State3:
 state = table3[bytes[i]];
 break;
 case State4:
-if(Segment2.Begin < 0)Segment2.Begin = i;
 state = table4[bytes[i]];
 break;
 case State5:
 state = table5[bytes[i]];
 break;
 case State6:
-Segment2.End = i;
 state = table6[bytes[i]];
 break;
 case State7:
 state = table7[bytes[i]];
 break;
 case State8:
-Segment2.End = i;
 state = table8[bytes[i]];
 break;
 case State9:
-if(Item.Begin < 0)Item.Begin = i;
-Item.End = i;
-Final = true;
-goto exit1;
+state = table9[bytes[i]];
+break;
 case State10:
 state = table10[bytes[i]];
 break;
 case State11:
-Segment2.End = i;
+if(Auid.Begin < 0)Auid.Begin = i;
 state = table11[bytes[i]];
 break;
 case State12:
-Item.End = i;
-Final = true;
-goto exit1;
+Auid.End = i;
+state = table12[bytes[i]];
+break;
 case State13:
-if(DocumentName.Begin < 0)DocumentName.Begin = i;
 state = table13[bytes[i]];
 break;
 case State14:
-Segment2.End = i;
+if(Segment2.Begin < 0)Segment2.Begin = i;
 state = table14[bytes[i]];
 break;
 case State15:
-Final = true;
-goto exit1;
+state = table15[bytes[i]];
+break;
 case State16:
+Segment2.End = i;
 state = table16[bytes[i]];
 break;
 case State17:
-Final = true;
-goto exit1;
+state = table17[bytes[i]];
+break;
 case State18:
 Segment2.End = i;
 state = table18[bytes[i]];
 break;
 case State19:
-state = table19[bytes[i]];
-break;
-case State20:
+if(Item.Begin < 0)Item.Begin = i;
+Item.End = i;
 Final = true;
 goto exit1;
+case State20:
+state = table20[bytes[i]];
+break;
 case State21:
 Segment2.End = i;
 state = table21[bytes[i]];
 break;
 case State22:
+Item.End = i;
 Final = true;
 goto exit1;
 case State23:
+if(DocumentName.Begin < 0)DocumentName.Begin = i;
+state = table23[bytes[i]];
+break;
+case State24:
+Segment2.End = i;
+state = table24[bytes[i]];
+break;
+case State25:
+Final = true;
+goto exit1;
+case State26:
+state = table26[bytes[i]];
+break;
+case State27:
+Final = true;
+goto exit1;
+case State28:
+Segment2.End = i;
+state = table28[bytes[i]];
+break;
+case State29:
+state = table29[bytes[i]];
+break;
+case State30:
+Final = true;
+goto exit1;
+case State31:
+Segment2.End = i;
+state = table31[bytes[i]];
+break;
+case State32:
+Final = true;
+goto exit1;
+case State33:
 IsGlobal = true;
 Segment2.End = i;
 Final = true;
 goto exit1;
-case State24:
+case State34:
 Final = true;
 goto exit1;
-case State25:
+case State35:
 if(DocumentName.Begin < 0)DocumentName.Begin = i;
 if(Item.Begin < 0)Item.Begin = i;
 Item.End = i;
 Final = true;
 goto exit1;
-case State26:
+case State36:
 DocumentName.End = i;
 Final = true;
 goto exit1;
-case State27:
+case State37:
 Item.End = i;
 Final = true;
 goto exit1;
-case State28:
+case State38:
 Item.End = i;
 Final = true;
 goto exit1;
-case State29:
+case State39:
 Item.End = i;
 Final = true;
 goto exit1;
-case State30:
+case State40:
 Item.End = i;
 Final = true;
 goto exit1;
-case State31:
+case State41:
 Item.End = i;
 Final = true;
 goto exit1;
-case State32:
+case State42:
 DocumentName.End = i;
 Item.End = i;
 Final = true;
 goto exit1;
-case State33:
+case State43:
 i--;
 Error = true;
 goto exit1;
@@ -503,112 +613,132 @@ switch(state)
 case State0:
 break;
 case State1:
-if(Auid.Begin < 0)Auid.Begin = i;
 break;
 case State2:
-Auid.End = i;
 break;
 case State3:
 break;
 case State4:
-if(Segment2.Begin < 0)Segment2.Begin = i;
 break;
 case State5:
 break;
 case State6:
-Segment2.End = i;
 break;
 case State7:
 break;
 case State8:
-Segment2.End = i;
 break;
 case State9:
-if(Item.Begin < 0)Item.Begin = i;
-Item.End = i;
-Final = true;
-goto exit1;
+break;
 case State10:
 break;
 case State11:
-Segment2.End = i;
+if(Auid.Begin < 0)Auid.Begin = i;
 break;
 case State12:
-Item.End = i;
-Final = true;
-goto exit1;
+Auid.End = i;
+break;
 case State13:
-if(DocumentName.Begin < 0)DocumentName.Begin = i;
 break;
 case State14:
-Segment2.End = i;
+if(Segment2.Begin < 0)Segment2.Begin = i;
 break;
 case State15:
-Final = true;
-goto exit1;
+break;
 case State16:
+Segment2.End = i;
 break;
 case State17:
-Final = true;
-goto exit1;
+break;
 case State18:
 Segment2.End = i;
 break;
 case State19:
-break;
-case State20:
+if(Item.Begin < 0)Item.Begin = i;
+Item.End = i;
 Final = true;
 goto exit1;
+case State20:
+break;
 case State21:
 Segment2.End = i;
 break;
 case State22:
+Item.End = i;
 Final = true;
 goto exit1;
 case State23:
+if(DocumentName.Begin < 0)DocumentName.Begin = i;
+break;
+case State24:
+Segment2.End = i;
+break;
+case State25:
+Final = true;
+goto exit1;
+case State26:
+break;
+case State27:
+Final = true;
+goto exit1;
+case State28:
+Segment2.End = i;
+break;
+case State29:
+break;
+case State30:
+Final = true;
+goto exit1;
+case State31:
+Segment2.End = i;
+break;
+case State32:
+Final = true;
+goto exit1;
+case State33:
 IsGlobal = true;
 Segment2.End = i;
 Final = true;
 goto exit1;
-case State24:
+case State34:
 Final = true;
 goto exit1;
-case State25:
+case State35:
 if(DocumentName.Begin < 0)DocumentName.Begin = i;
 if(Item.Begin < 0)Item.Begin = i;
 Item.End = i;
 Final = true;
 goto exit1;
-case State26:
+case State36:
 DocumentName.End = i;
 Final = true;
 goto exit1;
-case State27:
+case State37:
 Item.End = i;
 Final = true;
 goto exit1;
-case State28:
+case State38:
 Item.End = i;
 Final = true;
 goto exit1;
-case State29:
+case State39:
 Item.End = i;
 Final = true;
 goto exit1;
-case State30:
+case State40:
 Item.End = i;
 Final = true;
 goto exit1;
-case State31:
+case State41:
 Item.End = i;
 Final = true;
 goto exit1;
-case State32:
+case State42:
 DocumentName.End = i;
 Item.End = i;
 Final = true;
 goto exit1;
-case State33:
+case State43:
 i--;
 Error = true;
 goto exit1;

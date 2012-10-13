@@ -14,6 +14,10 @@ namespace XcapServer
 
 		static void Main(string[] args)
 		{
+			var exePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+			/////////////////////////////////////////////////////////////////////////
+
 			serversManager = new ServersManager<HttpConnection>(new ServersManagerConfig());
 
 			serversManager.Bind(new ProtocolPort() { Protocol = ServerProtocol.Tcp, Port = 8080, });
@@ -26,6 +30,8 @@ namespace XcapServer
 			serversManager.Received += ServersManager_Received;
 			serversManager.Sent += ServersManager_Sent;
 
+			serversManager.Logger.Enable(exePath + @"\Log.pcap");
+
 			/////////////////////////////////////////////////////////////////////////
 
 			HttpMessage.BufferManager = new BufferManagerProxy();
@@ -34,14 +40,14 @@ namespace XcapServer
 
 			Console.WriteLine(@"Loading DFA table...");
 
-			var exePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
 			HttpMessageReader.LoadTables(exePath + @"\Http.Message.dfa");
 			XcapPathParser.LoadTables(exePath);
 
 			/////////////////////////////////////////////////////////////////////////
 
 			xcapServer = new XcapServer(SendAsync);
+			xcapServer.AddHandler(new ResourceListsHandlerExample());
+			//xcapServer.AddHandler(new RlsServicesHandler());
 
 			/////////////////////////////////////////////////////////////////////////
 

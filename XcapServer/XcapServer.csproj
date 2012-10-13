@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuidHandlers\BaseAuidHandler.cs" />
+    <Compile Include="AuidHandlers\ResourceListsHandlerExample.cs" />
     <Compile Include="XcapErrors.cs" />
     <Compile Include="AuidHandlers\ResourceListsHandler.cs" />
     <Compile Include="AuidHandlers\RlsServicesHandler.cs" />

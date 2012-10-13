@@ -15,5 +15,6 @@ namespace XcapServer
 		HttpMessageWriter ProcessGlobal();
 		HttpMessageWriter ProcessGetItem(string item);
 		HttpMessageWriter ProcessPutItem(string item, ArraySegment<byte> content);
+		HttpMessageWriter ProcessDeleteItem(string item);
 	}
 }

@@ -24,21 +24,6 @@ namespace XcapServer
 			this.xcapCapsHander = new XcapCapsHandler();
 
 			AddHandler(this.xcapCapsHander);
-			AddHandler(new ResourceListsHandler());
-			AddHandler(new RlsServicesHandler());
-
-			//InitializeXcapPathParser();
-			//int parsed;
-			//var uri = "/rls-resourses/users/sip:jitsi@officesip.local/index";
-			//if (pathParser.ParseAll(new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(uri)), out parsed) == false)
-			//{
-			//    Console.WriteLine(uri);
-			//    Console.WriteLine("^".PadLeft(parsed + 1));
-			//}
-			//else
-			//{
-			//    Console.WriteLine(uri + " - ok");
-			//}
 		}
 
 		public void AddHandler(IAuidHandler handler)
@@ -47,36 +32,46 @@ namespace XcapServer
 
 			handlers.Add(handler);
 
-			xcapCapsHander.Update(handlers);
+			xcapCapsHander.Invalidate();
 		}
 
 		public void ProcessIncomingMessage(HttpConnection c, out bool closeConnection)
 		{
+			Console.WriteLine("{0} :: {1}", c.HttpReader.Method.ToString(), c.HttpReader.RequestUri.ToString());
+
 			closeConnection = false;
+
+			HttpMessageWriter response = null;
 
 			InitializeXcapPathParser();
 
-			bool error = true;
 			int parsed;
-			if (pathParser.ParseAll(c.HttpReader.RequestUri.ToArraySegment(), out parsed))
+			if (pathParser.ParseAll(c.HttpReader.RequestUri.ToArraySegment(), out parsed) == false)
+			{
+				Console.WriteLine("Failed to parse requesr uri.");
+				Console.WriteLine("   " + c.HttpReader.RequestUri.ToString());
+				Console.WriteLine("   " + "^".PadLeft(parsed + 1, '-'));
+			}
+			else
 			{
 				pathParser.SetArray(c.HttpReader.RequestUri.Bytes);
 
-				var request = System.Text.Encoding.UTF8.GetString(c.Header.Array, c.Header.Offset, c.Header.Count);
-
-				Console.Write("{2} / {0} / {1}", pathParser.Auid.ToString(), pathParser.Segment2.ToString(), c.HttpReader.Method.ToString());
-				if (pathParser.IsGlobal == false)
-					Console.Write(" / {0}", pathParser.Item.ToString());
-				Console.WriteLine(" / {0}", pathParser.DocumentName.ToString());
+				//Console.Write("{2} / {0} / {1}", pathParser.Auid.ToString(), pathParser.Segment2.ToString(), c.HttpReader.Method.ToString());
+				//if (pathParser.IsGlobal == false)
+				//    Console.Write(" / {0}", pathParser.Item.ToString());
+				//Console.WriteLine(" / {0}", pathParser.DocumentName.ToString());
 
 				var handler = GetHandler(pathParser.Auid.ToString());
 
+				if (handler == xcapCapsHander && xcapCapsHander.IsValid == false)
+					xcapCapsHander.Update(handlers);
+
 				if (handler != null)
 				{
-					HttpMessageWriter response;
-
 					if (pathParser.IsGlobal)
+					{
 						response = handler.ProcessGlobal();
+					}
 					else
 					{
 						switch (c.HttpReader.Method)
@@ -87,38 +82,33 @@ namespace XcapServer
 							case Methods.Put:
 								response = handler.ProcessPutItem(pathParser.Item.ToString(), c.Content);
 								break;
+							case Methods.Delete:
+								response = handler.ProcessDeleteItem(pathParser.Item.ToString());
+								break;
 							default:
 								response = null;
 								break;
 						}
 					}
-
-					if (response != null)
-					{
-						sendAsync(c, response);
-						error = false;
-					}
 				}
 			}
-			else
-			{
-				Console.WriteLine(c.HttpReader.RequestUri.ToString());
-				Console.WriteLine("^".PadLeft(parsed + 1));
-			}
 
-			if (error)
-			{
-				StatusCodes statusCode = StatusCodes.NotFound;
 
-				using (var writer = new HttpMessageWriter())
-				{
-					writer.WriteStatusLine(statusCode);
-					writer.WriteContentLength(0);
-					writer.WriteCRLF();
+			if (response == null)
+				response = GenerateErrorResponse(StatusCodes.NotFound);
 
-					sendAsync(c, writer);
-				}
-			}
+			sendAsync(c, response);
+		}
+
+		private HttpMessageWriter GenerateErrorResponse(StatusCodes statusCode)
+		{
+			var writer = GetWriter();
+
+			writer.WriteStatusLine(statusCode);
+			writer.WriteContentLength(0);
+			writer.WriteCRLF();
+
+			return writer;
 		}
 
 		private IAuidHandler GetHandler(string auid)

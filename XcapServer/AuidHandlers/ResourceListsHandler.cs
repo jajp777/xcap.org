@@ -7,12 +7,12 @@ using Http.Message;
 
 namespace XcapServer
 {
-	class ResourceListsHandler
+	abstract class ResourceListsHandler
 		: BaseAuidHandler
 	{
 		#region struct Entry {...}
 
-		struct Entry
+		protected struct Entry
 		{
 			public Entry(string uri)
 				: this(uri, null)
@@ -36,14 +36,9 @@ namespace XcapServer
 		{
 		}
 
-		public override HttpMessageWriter ProcessGlobal()
-		{
-			throw new NotImplementedException();
-		}
-
 		public override HttpMessageWriter ProcessGetItem(string item)
 		{
-			var content = CreateResourceList(Generate(100));
+			var content = CreateResourceList(GetEntries());
 
 			var writer = GetWritter();
 
@@ -56,13 +51,7 @@ namespace XcapServer
 			return writer;
 		}
 
-		private IEnumerable<Entry> Generate(int count)
-		{
-			yield return new Entry("sip:jitsi@officesip.local", "Jitsi");
-
-			for (int i = 0; i < count; i++)
-				yield return new Entry("sip:user" + i + "@officesip.local", "User #" + i);
-		}
+		protected abstract IEnumerable<Entry> GetEntries();
 
 		private byte[] CreateResourceList(IEnumerable<Entry> list)
 		{
@@ -72,7 +61,7 @@ namespace XcapServer
 				writer.WriteStartElement(Auid, Namespace);
 
 				writer.WriteStartElement("list");
-				writer.WriteAttributeString("name", "RootGroup");//"All Contacts");
+				writer.WriteAttributeString("name", "RootGroup");
 
 				foreach (var entry in list)
 				{
@@ -85,12 +74,17 @@ namespace XcapServer
 					writer.WriteEndElement();
 				}
 
-				writer.WriteEndElement();
-				writer.WriteEndElement();
+				//writer.WriteStartElement("list");
+				//writer.WriteAttributeString("name", "All Contacts");
+				//writer.WriteStartElement("entry");
+				//writer.WriteAttributeString("uri", "sip:test@officesip.local");
+				//writer.WriteEndElement();
+				//writer.WriteEndElement();
+
+				writer.WriteEndElement(); // list
+				writer.WriteEndElement(); // auid
 
 				writer.Flush();
-
-				var result = Encoding.UTF8.GetString(memoryStream.ToArray());
 
 				return memoryStream.ToArray();
 			}

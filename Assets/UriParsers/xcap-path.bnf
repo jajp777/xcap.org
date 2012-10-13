@@ -1,6 +1,8 @@
 ;@using "rfc4825.bnf"
 
-xcap-path          =  "/" path-a-uid "/" ( path-global / path-items )
+xcap-path          =  "/" "xcap-root" 
+                      "/" path-a-uid 
+                      "/" ( path-global / path-items )
                       [ "/" document-name ]
 
 path-a-uid         =  a-uid / "xcap-caps" / "resource-lists" / "rls-resources"

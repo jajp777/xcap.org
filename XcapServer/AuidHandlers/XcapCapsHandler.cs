@@ -17,10 +17,20 @@ namespace XcapServer
 		{
 		}
 
+		public bool IsValid
+		{
+			get { return response != null; }
+		}
+
+		public void Invalidate()
+		{
+			response = null;
+		}
+
 		public void Update(IEnumerable<IAuidHandler> handlers)
 		{
 			using (var memoryStream = new MemoryStream(2048))
-			using (var writer = XmlWriter.Create(memoryStream, new XmlWriterSettings() { /*Indent = true, */Encoding = new UTF8Encoding(false), }))
+			using (var writer = XmlWriter.Create(memoryStream, new XmlWriterSettings() { Indent = true, Encoding = new UTF8Encoding(false), }))
 			{
 				writer.WriteStartElement(Auid, Namespace);
 
