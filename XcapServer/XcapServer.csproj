@@ -49,6 +49,10 @@
   <ItemGroup>
     <Compile Include="AuidHandlers\BaseAuidHandler.cs" />
     <Compile Include="AuidHandlers\ResourceListsHandlerExample.cs" />
+    <Compile Include="Http\HttpServer.cs" />
+    <Compile Include="Http\IHttpServer.cs" />
+    <Compile Include="Http\IHttpServerAgent.cs" />
+    <Compile Include="Http\IHttpServerAgentRegistrar.cs" />
     <Compile Include="XcapErrors.cs" />
     <Compile Include="AuidHandlers\ResourceListsHandler.cs" />
     <Compile Include="AuidHandlers\RlsServicesHandler.cs" />

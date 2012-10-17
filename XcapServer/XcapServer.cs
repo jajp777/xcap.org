@@ -1,29 +1,37 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using Base.Message;
 using Http.Message;
 using Xcap.PathParser;
+using SocketServers;
+using Http.Server;
 
 namespace XcapServer
 {
 	class XcapServer
+		: IHttpServerAgent
 	{
-		public delegate void SendAsyncDelegate(HttpConnection c, HttpMessageWriter writer);
+		private static readonly byte[] xcapUri = Encoding.UTF8.GetBytes("/xcap-root/");
 
 		[ThreadStatic]
 		private static XcapPathParser pathParser;
-		private List<IAuidHandler> handlers;
-		private XcapCapsHandler xcapCapsHander;
-		private SendAsyncDelegate sendAsync;
 
-		public XcapServer(SendAsyncDelegate sendAsync)
+		private readonly IHttpServer httpServer;
+		private readonly List<IAuidHandler> handlers;
+		private readonly XcapCapsHandler xcapCapsHander;
+
+		public XcapServer(IHttpServerAgentRegistrar registrar)
 		{
-			this.sendAsync = sendAsync;
-
+			this.httpServer = registrar.Register(this);
 			this.handlers = new List<IAuidHandler>();
 			this.xcapCapsHander = new XcapCapsHandler();
 
 			AddHandler(this.xcapCapsHander);
+		}
+
+		public void Dispose()
+		{
 		}
 
 		public void AddHandler(IAuidHandler handler)
@@ -35,26 +43,29 @@ namespace XcapServer
 			xcapCapsHander.Invalidate();
 		}
 
-		public void ProcessIncomingMessage(HttpConnection c, out bool closeConnection)
+		bool IHttpServerAgent.IsHandled(HttpMessageReader httpReader)
 		{
-			Console.WriteLine("{0} :: {1}", c.HttpReader.Method.ToString(), c.HttpReader.RequestUri.ToString());
+			return httpReader.RequestUri.StartsWith(xcapUri);
+		}
 
-			closeConnection = false;
+		void IHttpServerAgent.HandleRequest(BaseConnection c, HttpMessageReader httpReader, ArraySegment<byte> httpContent)
+		{
+			Console.WriteLine("{0} :: {1}", httpReader.Method.ToString(), httpReader.RequestUri.ToString());
 
 			HttpMessageWriter response = null;
 
 			InitializeXcapPathParser();
 
 			int parsed;
-			if (pathParser.ParseAll(c.HttpReader.RequestUri.ToArraySegment(), out parsed) == false)
+			if (pathParser.ParseAll(httpReader.RequestUri.ToArraySegment(), out parsed) == false)
 			{
 				Console.WriteLine("Failed to parse requesr uri.");
-				Console.WriteLine("   " + c.HttpReader.RequestUri.ToString());
+				Console.WriteLine("   " + httpReader.RequestUri.ToString());
 				Console.WriteLine("   " + "^".PadLeft(parsed + 1, '-'));
 			}
 			else
 			{
-				pathParser.SetArray(c.HttpReader.RequestUri.Bytes);
+				pathParser.SetArray(httpReader.RequestUri.Bytes);
 
 				//Console.Write("{2} / {0} / {1}", pathParser.Auid.ToString(), pathParser.Segment2.ToString(), c.HttpReader.Method.ToString());
 				//if (pathParser.IsGlobal == false)
@@ -74,13 +85,13 @@ namespace XcapServer
 					}
 					else
 					{
-						switch (c.HttpReader.Method)
+						switch (httpReader.Method)
 						{
 							case Methods.Get:
 								response = handler.ProcessGetItem(pathParser.Item.ToString());
 								break;
 							case Methods.Put:
-								response = handler.ProcessPutItem(pathParser.Item.ToString(), c.Content);
+								response = handler.ProcessPutItem(pathParser.Item.ToString(), httpContent);
 								break;
 							case Methods.Delete:
 								response = handler.ProcessDeleteItem(pathParser.Item.ToString());
@@ -97,7 +108,7 @@ namespace XcapServer
 			if (response == null)
 				response = GenerateErrorResponse(StatusCodes.NotFound);
 
-			sendAsync(c, response);
+			httpServer.SendResponse(c, response);
 		}
 
 		private HttpMessageWriter GenerateErrorResponse(StatusCodes statusCode)

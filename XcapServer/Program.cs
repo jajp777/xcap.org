@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using SocketServers;
 using Http.Message;
+using Http.Server;
 using Xcap.PathParser;
 
 namespace XcapServer
@@ -11,6 +12,7 @@ namespace XcapServer
 	{
 		private static ServersManager<HttpConnection> serversManager;
 		private static XcapServer xcapServer;
+		private static HttpServer httpServer;
 
 		static void Main(string[] args)
 		{
@@ -45,7 +47,12 @@ namespace XcapServer
 
 			/////////////////////////////////////////////////////////////////////////
 
-			xcapServer = new XcapServer(SendAsync);
+			httpServer = new HttpServer();
+			httpServer.SendAsync = serversManager.SendAsync;
+
+			/////////////////////////////////////////////////////////////////////////
+
+			xcapServer = new XcapServer(httpServer);
 			xcapServer.AddHandler(new ResourceListsHandlerExample());
 			//xcapServer.AddHandler(new RlsServicesHandler());
 
@@ -71,19 +78,6 @@ namespace XcapServer
 			Console.WriteLine();
 		}
 
-		static void SendAsync(HttpConnection c, HttpMessageWriter writer)
-		{
-			var r = EventArgsManager.Get();
-			r.CopyAddressesFrom(c);
-			r.Count = writer.Count;
-			r.OffsetOffset = writer.OffsetOffset;
-			r.AttachBuffer(writer.Detach());
-
-			serversManager.SendAsync(r);
-
-			writer.Dispose();
-		}
-
 		static bool ServersManager_Received(ServersManager<HttpConnection> s, HttpConnection connection, ref ServerAsyncEventArgs e)
 		{
 			bool closeConnection = false, repeat = true;
@@ -94,7 +88,7 @@ namespace XcapServer
 
 				if (connection.IsMessageReady)
 				{
-					xcapServer.ProcessIncomingMessage(connection, out closeConnection);
+					httpServer.ProcessIncomingRequest(connection);
 					connection.ResetState();
 				}
 			}
