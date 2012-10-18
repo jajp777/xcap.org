@@ -28,7 +28,7 @@ namespace Http.Server
 			xcapServer.Dispose();
 		}
 
-		IHttpServer IHttpServerAgentRegistrar.Register(IHttpServerAgent agent)
+		IHttpServer IHttpServerAgentRegistrar.Register(IHttpServerAgent agent, int priority)
 		{
 			xcapServer = agent;
 			return this;

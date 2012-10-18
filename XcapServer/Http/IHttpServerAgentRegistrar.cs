@@ -5,6 +5,6 @@ namespace Http.Server
 {
 	interface IHttpServerAgentRegistrar
 	{
-		IHttpServer Register(IHttpServerAgent agent);
+		IHttpServer Register(IHttpServerAgent agent, int priority);
 	}
 }

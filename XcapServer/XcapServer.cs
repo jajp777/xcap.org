@@ -25,7 +25,7 @@ namespace XcapServer
 
 		public XcapServer(IHttpServerAgentRegistrar registrar)
 		{
-			this.httpServer = registrar.Register(this);
+			this.httpServer = registrar.Register(this, 0);
 			this.genericHandlers = new List<IGenericAuidHandler>();
 			this.xcapCapsHander = new XcapCapsHandler();
 
