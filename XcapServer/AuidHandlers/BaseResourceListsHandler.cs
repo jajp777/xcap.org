@@ -3,12 +3,14 @@ using System.IO;
 using System.Xml;
 using System.Text;
 using System.Collections.Generic;
+using Base.Message;
 using Http.Message;
 
 namespace XcapServer
 {
-	abstract class ResourceListsHandler
+	abstract class BaseResourceListsHandler
 		: BaseAuidHandler
+		, IResourceListHandler
 	{
 		#region struct Entry {...}
 
@@ -31,16 +33,16 @@ namespace XcapServer
 
 		#endregion
 
-		public ResourceListsHandler()
+		public BaseResourceListsHandler()
 			: base("resource-lists", "urn:ietf:params:xml:ns:resource-lists", "users")
 		{
 		}
 
-		public override HttpMessageWriter ProcessGetItem(string item)
+		public HttpMessageWriter ProcessGetItem(ByteArrayPart username, ByteArrayPart domain)
 		{
-			var content = CreateResourceList(GetEntries());
+			var content = CreateResourceList(GetEntries(username, domain));
 
-			var writer = GetWritter();
+			var writer = Context.GetWriter();
 
 			writer.WriteStatusLine(StatusCodes.OK);
 			writer.WriteContentType(ContentType.ApplicationResourceListsXml);
@@ -51,7 +53,17 @@ namespace XcapServer
 			return writer;
 		}
 
-		protected abstract IEnumerable<Entry> GetEntries();
+		public HttpMessageWriter ProcessPutItem(ByteArrayPart username, ByteArrayPart domain, ArraySegment<byte> content)
+		{
+			return CreateErrorResponse(XcapErrors.CannotInsert, "Not Implemented");
+		}
+
+		public HttpMessageWriter ProcessDeleteItem(ByteArrayPart username, ByteArrayPart domain)
+		{
+			return CreateErrorResponse(XcapErrors.CannotDelete, "Not Implemented");
+		}
+
+		protected abstract IEnumerable<Entry> GetEntries(ByteArrayPart username, ByteArrayPart domain);
 
 		private byte[] CreateResourceList(IEnumerable<Entry> list)
 		{

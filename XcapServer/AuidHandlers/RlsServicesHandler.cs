@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Base.Message;
 using Http.Message;
 
 namespace XcapServer
 {
 	class RlsServicesHandler
-		: BaseAuidHandler
+		: BaseGenericAuidHandler
 	{
 		public RlsServicesHandler()
 			: base("rls-services", "urn:ietf:params:xml:ns:rls-services", "users")
@@ -14,7 +15,7 @@ namespace XcapServer
 
 		public override HttpMessageWriter ProcessGlobal()
 		{
-			var writer = GetWritter();
+			var writer = Context.GetWriter();
 
 			writer.WriteStatusLine(StatusCodes.OK);
 			writer.WriteContentLength(0);
@@ -23,7 +24,7 @@ namespace XcapServer
 			return writer;
 		}
 
-		public override HttpMessageWriter ProcessGetItem(string item)
+		public override HttpMessageWriter ProcessGetItem(ByteArrayPart item)
 		{
 			throw new NotImplementedException();
 		}

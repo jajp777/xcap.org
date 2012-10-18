@@ -1,10 +1,10 @@
 
-xcap-path.path-a-uid.a-uid -> Range = Auid;
-
-xcap-path.path-global.global -> Bool = IsGlobal;
-
-xcap-path.path-items.a-uid -> Range = Segment2;
-
-xcap-path.path-items.path-item -> Range = Item;
+xcap-path.generic.path-a-uid.a-uid -> Range = Auid;
+xcap-path.generic.path-global.global -> Bool = IsGlobal;
+xcap-path.generic.path-items.a-uid -> Range = Segment2;
+xcap-path.generic.path-items.path-item -> Range = Item;
 
 xcap-path.document-name.index -> Range = DocumentName;
+
+xcap-path.resource-lists.username -> Range = Username;
+xcap-path.resource-lists.domain -> Range = Domain;

@@ -3,18 +3,19 @@ using System.IO;
 using System.Xml;
 using System.Text;
 using System.Collections.Generic;
+using Base.Message;
 using Http.Message;
 
 namespace XcapServer
 {
 	class ResourceListsHandlerExample
-		: ResourceListsHandler
+		: BaseResourceListsHandler
 	{
 		public ResourceListsHandlerExample()
 		{
 		}
 
-		protected override IEnumerable<Entry> GetEntries()
+		protected override IEnumerable<Entry> GetEntries(ByteArrayPart username, ByteArrayPart domain)
 		{
 			return Generate(20);
 		}

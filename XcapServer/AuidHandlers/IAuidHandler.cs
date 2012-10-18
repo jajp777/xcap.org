@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using Base.Message;
 using Http.Message;
 
 namespace XcapServer
@@ -10,11 +10,6 @@ namespace XcapServer
 		string Segment2 { get; }
 		string Namespace { get; }
 
-		Func<HttpMessageWriter> GetWritter { set; }
-
-		HttpMessageWriter ProcessGlobal();
-		HttpMessageWriter ProcessGetItem(string item);
-		HttpMessageWriter ProcessPutItem(string item, ArraySegment<byte> content);
-		HttpMessageWriter ProcessDeleteItem(string item);
+		IAuidHandlerContext Context { set; }
 	}
 }

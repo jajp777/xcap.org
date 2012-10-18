@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml;
 using System.Text;
 using System.Collections.Generic;
+using Base.Message;
 using Http.Message;
 
 namespace XcapServer
@@ -20,37 +21,11 @@ namespace XcapServer
 		public string Auid { get; private set; }
 		public string Namespace { get; private set; }
 		public string Segment2 { get; private set; }
-
-		public Func<HttpMessageWriter> GetWritter { protected get; set; }
-
-		public virtual HttpMessageWriter ProcessGlobal()
-		{
-			return null;
-		}
-
-		public virtual HttpMessageWriter ProcessGetItem(string item)
-		{
-			return null;
-		}
-
-		public virtual HttpMessageWriter ProcessPutItem(string item, ArraySegment<byte> content)
-		{
-			return CreateErrorResponse(XcapErrors.CannotInsert, "Not Implemented");
-		}
-
-		public virtual HttpMessageWriter ProcessDeleteItem(string item)
-		{
-			return CreateErrorResponse(XcapErrors.CannotDelete, "Not Implemented");
-		}
-
-		protected HttpMessageWriter CreateErrorResponse(XcapErrors error, string phrase)
-		{
-			return CreateResponse(StatusCodes.Conflict, ContentType.ApplicationXcapErrorXml, CreateErrorContent(XcapErrors.CannotInsert, phrase));
-		}
+		public IAuidHandlerContext Context { get; set; }
 
 		protected HttpMessageWriter CreateResponse(StatusCodes statusCodes, ContentType contentType, byte[] content)
 		{
-			var writer = GetWritter();
+			var writer = Context.GetWriter();
 
 			writer.WriteStatusLine(statusCodes);
 			writer.WriteContentType(contentType);
@@ -59,6 +34,11 @@ namespace XcapServer
 			writer.Write(content);
 
 			return writer;
+		}
+
+		protected HttpMessageWriter CreateErrorResponse(XcapErrors error, string phrase)
+		{
+			return CreateResponse(StatusCodes.Conflict, ContentType.ApplicationXcapErrorXml, CreateErrorContent(XcapErrors.CannotInsert, phrase));
 		}
 
 		protected byte[] CreateErrorContent(XcapErrors error, string phrase)

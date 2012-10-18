@@ -3,12 +3,13 @@ using System.IO;
 using System.Xml;
 using System.Text;
 using System.Collections.Generic;
+using Base.Message;
 using Http.Message;
 
 namespace XcapServer
 {
 	class XcapCapsHandler
-		: BaseAuidHandler
+		: BaseGenericAuidHandler
 	{
 		private byte[] response;
 
@@ -59,7 +60,7 @@ namespace XcapServer
 
 		public override HttpMessageWriter ProcessGlobal()
 		{
-			var writer = GetWritter();
+			var writer = Context.GetWriter();
 
 			writer.WriteStatusLine(StatusCodes.OK);
 			writer.WriteContentType(ContentType.ApplicationXcapCapsXml);
@@ -70,7 +71,7 @@ namespace XcapServer
 			return writer;
 		}
 
-		public override HttpMessageWriter ProcessGetItem(string item)
+		public override HttpMessageWriter ProcessGetItem(ByteArrayPart item)
 		{
 			throw new NotImplementedException();
 		}

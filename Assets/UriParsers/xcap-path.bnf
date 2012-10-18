@@ -1,13 +1,20 @@
 ;@using "rfc4825.bnf"
 
-xcap-path          =  "/" "xcap-root" 
-                      "/" path-a-uid 
-                      "/" ( path-global / path-items )
+xcap-path          =  "/xcap-root/" 
+                      (
+                          generic
+                        / resource-lists
+                      )
                       [ "/" document-name ]
 
-path-a-uid         =  a-uid / "xcap-caps" / "resource-lists" / "rls-resources"
+generic            =  path-a-uid "/" ( path-global / path-items )
+path-a-uid         =  a-uid
 path-global        =  "global"
 path-items         =  a-uid "/" path-item
 path-item          =  *(a-uid-unreserved / ":" / "@" / ".")
 document-name      =  a-uid / "index"
 
+
+resource-lists       =  "resource-lists/users/sip:" username "@" domain
+username             =  *(unreserved)
+domain               =  *(unreserved)
