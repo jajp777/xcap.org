@@ -5,9 +5,9 @@ using Base.Message;
 using Http.Message;
 using Xcap.PathParser;
 using SocketServers;
-using Http.Server;
+using Server.Http;
 
-namespace XcapServer
+namespace Server.Xcap
 {
 	class XcapServer
 		: IHttpServerAgent
@@ -18,14 +18,13 @@ namespace XcapServer
 		[ThreadStatic]
 		private static XcapPathParser pathParser;
 
-		private readonly IHttpServer httpServer;
+		private IHttpServer httpServer;
 		private readonly XcapCapsHandler xcapCapsHander;
 		private readonly List<IGenericAuidHandler> genericHandlers;
 		private IResourceListHandler resourceListHandler;
 
-		public XcapServer(IHttpServerAgentRegistrar registrar)
+		public XcapServer()
 		{
-			this.httpServer = registrar.Register(this, 0);
 			this.genericHandlers = new List<IGenericAuidHandler>();
 			this.xcapCapsHander = new XcapCapsHandler();
 
@@ -57,9 +56,27 @@ namespace XcapServer
 			xcapCapsHander.Invalidate();
 		}
 
-		bool IHttpServerAgent.IsHandled(HttpMessageReader httpReader)
+		IHttpServer IHttpServerAgent.IHttpServer
 		{
-			return httpReader.RequestUri.StartsWith(xcapUri);
+			set { httpServer = value; }
+		}
+
+		HttpServerAgent.IsHandledResult IHttpServerAgent.IsHandled(HttpMessageReader httpReader)
+		{
+			if (httpReader.RequestUri.StartsWith(xcapUri) == false)
+				return HttpServerAgent.IsHandledResult.NotHandle();
+
+			if (ParsePath(httpReader.RequestUri) && pathParser.Domain.IsValid)
+				return HttpServerAgent.IsHandledResult.HandleWithAuthorization(pathParser.Domain);
+
+			return HttpServerAgent.IsHandledResult.Handle();
+		}
+
+		bool IHttpServerAgent.IsAuthorized(HttpMessageReader httpReader, ByteArrayPart username)
+		{
+			return ParsePath(httpReader.RequestUri)
+				&& pathParser.Username.IsValid
+				&& pathParser.Username.Equals(username);
 		}
 
 		void IHttpServerAgent.HandleRequest(BaseConnection c, HttpMessageReader httpReader, ArraySegment<byte> httpContent)
@@ -183,6 +200,20 @@ namespace XcapServer
 		private HttpMessageWriter GetWriter()
 		{
 			return new HttpMessageWriter();
+		}
+
+		private bool ParsePath(ByteArrayPart requestUri)
+		{
+			InitializeXcapPathParser();
+
+			if (pathParser.ParseAll(requestUri.ToArraySegment()))
+			{
+				pathParser.SetArray(requestUri.Bytes);
+
+				return true;
+			}
+
+			return false;
 		}
 
 		private void InitializeXcapPathParser()

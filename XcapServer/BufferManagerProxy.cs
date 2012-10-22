@@ -1,7 +1,7 @@
 ﻿using System;
 using Base.Message;
 
-namespace XcapServer
+namespace Server.Xcap
 {
 	class BufferManagerProxy
 		: IBufferManager

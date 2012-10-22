@@ -1,7 +1,7 @@
 ﻿using System;
 using Http.Message;
 
-namespace XcapServer
+namespace Server.Xcap
 {
 	interface IAuidHandlerContext
 	{

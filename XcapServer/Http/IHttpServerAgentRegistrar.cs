@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Http.Server
+﻿
+namespace Server.Http
 {
 	interface IHttpServerAgentRegistrar
 	{
-		IHttpServer Register(IHttpServerAgent agent, int priority);
+		void Register(IHttpServerAgent agent, int priority, bool isAuthorizationEnabled);
 	}
 }

@@ -2,7 +2,7 @@
 using Http.Message;
 using SocketServers;
 
-namespace Http.Server
+namespace Server.Http
 {
 	interface IHttpServer
 	{

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using SocketServers;
 using Http.Message;
-using Http.Server;
+using Server.Http;
+using Server.Xcap;
 using Xcap.PathParser;
 
-namespace XcapServer
+namespace Server.Xcap
 {
 	class Program
 	{
@@ -47,14 +48,15 @@ namespace XcapServer
 
 			/////////////////////////////////////////////////////////////////////////
 
-			httpServer = new HttpServer();
-			httpServer.SendAsync = serversManager.SendAsync;
+			xcapServer = new XcapServer();
+			xcapServer.AddHandler(new ResourceListsHandlerExample());
+			//xcapServer.AddHandler(new RlsServicesHandler());
 
 			/////////////////////////////////////////////////////////////////////////
 
-			xcapServer = new XcapServer(httpServer);
-			xcapServer.AddHandler(new ResourceListsHandlerExample());
-			//xcapServer.AddHandler(new RlsServicesHandler());
+			httpServer = new HttpServer();
+			httpServer.SendAsync = serversManager.SendAsync;
+			(httpServer as IHttpServerAgentRegistrar).Register(xcapServer, 0, true);
 
 			/////////////////////////////////////////////////////////////////////////
 

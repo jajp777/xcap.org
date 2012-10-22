@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using Http.Message;
 using SocketServers;
-using XcapServer;
+using Server.Xcap;
 
-namespace Http.Server
+namespace Server.Http
 {
 	class HttpServer
 		: IDisposable
@@ -28,15 +28,15 @@ namespace Http.Server
 			xcapServer.Dispose();
 		}
 
-		IHttpServer IHttpServerAgentRegistrar.Register(IHttpServerAgent agent, int priority)
+		void IHttpServerAgentRegistrar.Register(IHttpServerAgent agent, int priority, bool isAuthEnabled)
 		{
 			xcapServer = agent;
-			return this;
+			xcapServer.IHttpServer = this;
 		}
 
 		public void ProcessIncomingRequest(HttpConnection c)
 		{
-			if (xcapServer.IsHandled(c.HttpReader))
+			if (xcapServer.IsHandled(c.HttpReader).IsHandled)
 				xcapServer.HandleRequest(c, c.HttpReader, c.Content);
 		}
 

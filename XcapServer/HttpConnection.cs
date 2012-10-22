@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SocketServers;
 using Http.Message;
 
-namespace XcapServer
+namespace Server.Xcap
 {
 	class HttpConnection
 		: HeaderContentConnection
