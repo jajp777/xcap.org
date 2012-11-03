@@ -8,3 +8,6 @@ xcap-path.document-name.index -> Range = DocumentName;
 
 xcap-path.resource-lists.username -> Range = Username;
 xcap-path.resource-lists.domain -> Range = Domain;
+
+xcap-path.pidf-manipulation.username -> Range = Username;
+xcap-path.pidf-manipulation.domain -> Range = Domain;

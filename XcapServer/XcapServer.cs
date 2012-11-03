@@ -3,7 +3,6 @@ using System.Text;
 using System.Collections.Generic;
 using Base.Message;
 using Http.Message;
-using Xcap.PathParser;
 using SocketServers;
 using Server.Http;
 
@@ -14,18 +13,61 @@ namespace Server.Xcap
 		, IAuidHandlerContext
 	{
 		private static readonly byte[] xcapUri = Encoding.UTF8.GetBytes("/xcap-root/");
+		private static readonly byte[] pidfManipulation = Encoding.UTF8.GetBytes("pidf-manipulation");
 
 		[ThreadStatic]
-		private static XcapPathParser pathParser;
+		private static XcapUriParser pathParser;
 
 		private IHttpServer httpServer;
 		private readonly XcapCapsHandler xcapCapsHander;
-		private readonly List<IGenericAuidHandler> genericHandlers;
-		private IResourceListHandler resourceListHandler;
+		private readonly HandlerCollection<IGenericAuidHandler> genericHandlers;
+		private readonly HandlerCollection<IUsersAuidHandler> usersHandlers;
+
+		#region class HandlerCollection<T> {...}
+
+		class HandlerCollection<T>
+			where T : IAuidHandler
+		{
+			private readonly List<T> list;
+
+			public HandlerCollection()
+			{
+				list = new List<T>();
+			}
+
+			public void Add(T handler)
+			{
+				list.Add(handler);
+			}
+
+			public T Get(string auid)
+			{
+				foreach (var handler in list)
+				{
+					if (handler.Auid == auid)
+						return handler;
+				}
+
+				return default(T);
+			}
+
+			public int Count
+			{
+				get { return list.Count; }
+			}
+
+			public T this[int index]
+			{
+				get { return list[index]; }
+			}
+		}
+
+		#endregion
 
 		public XcapServer()
 		{
-			this.genericHandlers = new List<IGenericAuidHandler>();
+			this.genericHandlers = new HandlerCollection<IGenericAuidHandler>();
+			this.usersHandlers = new HandlerCollection<IUsersAuidHandler>();
 			this.xcapCapsHander = new XcapCapsHandler();
 
 			AddHandler(this.xcapCapsHander);
@@ -44,14 +86,11 @@ namespace Server.Xcap
 			xcapCapsHander.Invalidate();
 		}
 
-		public void AddHandler(IResourceListHandler handler)
+		public void AddHandler(IUsersAuidHandler handler)
 		{
-			if (resourceListHandler != null)
-				throw new InvalidProgramException();
-
 			handler.Context = this;
 
-			resourceListHandler = handler;
+			usersHandlers.Add(handler);
 
 			xcapCapsHander.Invalidate();
 		}
@@ -66,17 +105,25 @@ namespace Server.Xcap
 			if (httpReader.RequestUri.StartsWith(xcapUri) == false)
 				return HttpServerAgent.IsHandledResult.NotHandle();
 
-			if (ParsePath(httpReader.RequestUri) && pathParser.Domain.IsValid)
-				return HttpServerAgent.IsHandledResult.HandleWithAuthorization(pathParser.Domain);
+			if (httpReader.Method == Methods.Options)
+				return HttpServerAgent.IsHandledResult.Handle();
 
-			return HttpServerAgent.IsHandledResult.Handle();
+			if (ParsePath(httpReader.RequestUri) == false)
+				return HttpServerAgent.IsHandledResult.Handle();
+
+			if (pathParser.Domain.IsInvalid || pathParser.Username.IsInvalid)
+				return HttpServerAgent.IsHandledResult.Handle();
+
+			if (pathParser.Auid.Equals(pidfManipulation) && httpReader.Method == Methods.Get)
+				return HttpServerAgent.IsHandledResult.Handle();
+
+			return HttpServerAgent.IsHandledResult.HandleWithAuthorization(pathParser.Domain);
 		}
 
 		bool IHttpServerAgent.IsAuthorized(HttpMessageReader httpReader, ByteArrayPart username)
 		{
 			return ParsePath(httpReader.RequestUri)
-				&& pathParser.Username.IsValid
-				&& pathParser.Username.Equals(username);
+				&& pathParser.Username.IsValid && pathParser.Username.Equals(username);
 		}
 
 		void IHttpServerAgent.HandleRequest(BaseConnection c, HttpMessageReader httpReader, ArraySegment<byte> httpContent)
@@ -98,53 +145,63 @@ namespace Server.Xcap
 			{
 				pathParser.SetArray(httpReader.RequestUri.Bytes);
 
-				if (pathParser.Username.IsValid && resourceListHandler != null)
+				if (httpReader.Method == Methods.Options)
 				{
-					switch (httpReader.Method)
-					{
-						case Methods.Get:
-							response = resourceListHandler.ProcessGetItem(pathParser.Username, pathParser.Domain);
-							break;
-						case Methods.Put:
-							response = resourceListHandler.ProcessPutItem(pathParser.Username, pathParser.Domain, httpContent);
-							break;
-						case Methods.Delete:
-							response = resourceListHandler.ProcessDeleteItem(pathParser.Username, pathParser.Domain);
-							break;
-						default:
-							response = null;
-							break;
-					}
+					response = GetWriter();
+					response.WriteOptionsResponse();
 				}
 				else
 				{
-					var handler = GetGenericHandler(pathParser.Auid.ToString());
-
-					if (handler == xcapCapsHander && xcapCapsHander.IsValid == false)
-						xcapCapsHander.Update(Handlers);
-
-					if (handler != null)
+					if (pathParser.Username.IsValid && pathParser.Domain.IsValid)
 					{
-						if (pathParser.IsGlobal)
+						var handler = usersHandlers.Get(pathParser.Auid.ToString());
+
+						switch (httpReader.Method)
 						{
-							response = handler.ProcessGlobal();
+							case Methods.Get:
+								response = handler.ProcessGetItem(pathParser.Username, pathParser.Domain);
+								break;
+							case Methods.Put:
+								response = handler.ProcessPutItem(pathParser.Username, pathParser.Domain, httpContent);
+								break;
+							case Methods.Delete:
+								response = handler.ProcessDeleteItem(pathParser.Username, pathParser.Domain);
+								break;
+							default:
+								response = null;
+								break;
 						}
-						else
+					}
+					else
+					{
+						var handler = genericHandlers.Get(pathParser.Auid.ToString());
+
+						if (handler == xcapCapsHander && xcapCapsHander.IsValid == false)
+							xcapCapsHander.Update(Handlers);
+
+						if (handler != null)
 						{
-							switch (httpReader.Method)
+							if (pathParser.IsGlobal)
 							{
-								case Methods.Get:
-									response = handler.ProcessGetItem(pathParser.Item);
-									break;
-								case Methods.Put:
-									response = handler.ProcessPutItem(pathParser.Item, httpContent);
-									break;
-								case Methods.Delete:
-									response = handler.ProcessDeleteItem(pathParser.Item);
-									break;
-								default:
-									response = null;
-									break;
+								response = handler.ProcessGlobal();
+							}
+							else
+							{
+								switch (httpReader.Method)
+								{
+									case Methods.Get:
+										response = handler.ProcessGetItem(pathParser.Item);
+										break;
+									case Methods.Put:
+										response = handler.ProcessPutItem(pathParser.Item, httpContent);
+										break;
+									case Methods.Delete:
+										response = handler.ProcessDeleteItem(pathParser.Item);
+										break;
+									default:
+										response = null;
+										break;
+								}
 							}
 						}
 					}
@@ -153,7 +210,10 @@ namespace Server.Xcap
 
 
 			if (response == null)
-				response = GenerateErrorResponse(StatusCodes.NotFound);
+			{
+				response = GetWriter();
+				response.WriteEmptyResponse(StatusCodes.NotFound);
+			}
 
 			httpServer.SendResponse(c, response);
 		}
@@ -162,34 +222,12 @@ namespace Server.Xcap
 		{
 			get
 			{
-				if (resourceListHandler != null)
-					yield return resourceListHandler;
+				for (int i = 0; i < usersHandlers.Count; i++)
+					yield return usersHandlers[i];
 
 				for (int i = 0; i < genericHandlers.Count; i++)
 					yield return genericHandlers[i];
 			}
-		}
-
-		private HttpMessageWriter GenerateErrorResponse(StatusCodes statusCode)
-		{
-			var writer = GetWriter();
-
-			writer.WriteStatusLine(statusCode);
-			writer.WriteContentLength(0);
-			writer.WriteCRLF();
-
-			return writer;
-		}
-
-		private IGenericAuidHandler GetGenericHandler(string auid)
-		{
-			foreach (var handler in genericHandlers)
-			{
-				if (handler.Auid == auid)
-					return handler;
-			}
-
-			return null;
 		}
 
 		HttpMessageWriter IAuidHandlerContext.GetWriter()
@@ -219,7 +257,7 @@ namespace Server.Xcap
 		private void InitializeXcapPathParser()
 		{
 			if (pathParser == null)
-				pathParser = new XcapPathParser();
+				pathParser = new XcapUriParser();
 
 			pathParser.SetDefaultValue();
 		}

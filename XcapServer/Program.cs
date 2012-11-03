@@ -5,7 +5,6 @@ using SocketServers;
 using Http.Message;
 using Server.Http;
 using Server.Xcap;
-using Xcap.PathParser;
 
 namespace Server.Xcap
 {
@@ -44,7 +43,7 @@ namespace Server.Xcap
 			Console.WriteLine(@"Loading DFA table...");
 
 			HttpMessageReader.LoadTables(exePath + @"\Http.Message.dfa");
-			XcapPathParser.LoadTables(exePath);
+			XcapUriParser.LoadTables(exePath);
 
 			/////////////////////////////////////////////////////////////////////////
 

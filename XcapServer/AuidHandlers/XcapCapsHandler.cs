@@ -64,6 +64,7 @@ namespace Server.Xcap
 
 			writer.WriteStatusLine(StatusCodes.OK);
 			writer.WriteContentType(ContentType.ApplicationXcapCapsXml);
+			writer.WriteAccessControlAllowOrigin(true);
 			writer.WriteContentLength(response.Length);
 			writer.WriteCRLF();
 			writer.Write(response);

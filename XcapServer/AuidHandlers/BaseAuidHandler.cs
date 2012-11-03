@@ -23,15 +23,29 @@ namespace Server.Xcap
 		public string Segment2 { get; private set; }
 		public IAuidHandlerContext Context { get; set; }
 
+		protected HttpMessageWriter CreateNotFinishedResponse(ContentType contentType)
+		{
+			var writer = Context.GetWriter();
+
+			writer.WriteNotFinishedResponse(contentType);
+
+			return writer;
+		}
+
 		protected HttpMessageWriter CreateResponse(StatusCodes statusCodes, ContentType contentType, byte[] content)
 		{
 			var writer = Context.GetWriter();
 
-			writer.WriteStatusLine(statusCodes);
-			writer.WriteContentType(contentType);
-			writer.WriteContentLength(content.Length);
-			writer.WriteCRLF();
-			writer.Write(content);
+			writer.WriteResponse(statusCodes, contentType, content);
+
+			return writer;
+		}
+
+		protected HttpMessageWriter CreateResponse(StatusCodes statusCodes)
+		{
+			var writer = Context.GetWriter();
+
+			writer.WriteEmptyResponse(statusCodes);
 
 			return writer;
 		}

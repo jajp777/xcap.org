@@ -10,7 +10,7 @@ namespace Server.Xcap
 {
 	abstract class BaseResourceListsHandler
 		: BaseAuidHandler
-		, IResourceListHandler
+		, IUsersAuidHandler
 	{
 		#region struct Entry {...}
 
@@ -40,12 +40,10 @@ namespace Server.Xcap
 
 		public HttpMessageWriter ProcessGetItem(ByteArrayPart username, ByteArrayPart domain)
 		{
+			var writer = base.CreateNotFinishedResponse(ContentType.ApplicationResourceListsXml);
+
 			var content = CreateResourceList(GetEntries(username, domain));
 
-			var writer = Context.GetWriter();
-
-			writer.WriteStatusLine(StatusCodes.OK);
-			writer.WriteContentType(ContentType.ApplicationResourceListsXml);
 			writer.WriteContentLength(content.Length);
 			writer.WriteCRLF();
 			writer.Write(content);

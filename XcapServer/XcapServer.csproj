@@ -51,7 +51,8 @@
     <Compile Include="AuidHandlers\BaseGenericAuidHandler.cs" />
     <Compile Include="AuidHandlers\IAuidHandlerContext.cs" />
     <Compile Include="AuidHandlers\IGenericAuidHandler.cs" />
-    <Compile Include="AuidHandlers\IResourceListHandler.cs" />
+    <Compile Include="AuidHandlers\IUsersAuidHandler.cs" />
+    <Compile Include="AuidHandlers\BasePidfManipulationHandler.cs" />
     <Compile Include="AuidHandlers\ResourceListsHandlerExample.cs" />
     <Compile Include="Http\HttpServer.cs" />
     <Compile Include="Http\IHttpServer.cs" />
@@ -66,13 +67,18 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AuidHandlers\XcapCapsHandler.cs" />
-    <Compile Include="XcapPathParser.cs" />
+    <Compile Include="XcapMessageWriter.cs" />
     <Compile Include="XcapServer.cs" />
+    <Compile Include="XcapUriParser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Xcap.PathParser.dfa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="PathParser\rfc3986.bnf" />
+    <None Include="PathParser\rfc4234.core.rules.bnf" />
+    <None Include="PathParser\rfc4825.bnf" />
+    <None Include="PathParser\xcap-path.bat" />
+    <None Include="PathParser\xcap-path.bnf" />
+    <None Include="PathParser\xcap-path.mrk" />
+    <None Include="Server.Xcap.dfa" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

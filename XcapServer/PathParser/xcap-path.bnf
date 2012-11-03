@@ -4,6 +4,7 @@ xcap-path          =  "/xcap-root/"
                       (
                           generic
                         / resource-lists
+                        / pidf-manipulation
                       )
                       [ "/" document-name ]
 
@@ -18,3 +19,5 @@ document-name      =  a-uid / "index"
 resource-lists       =  "resource-lists/users/sip:" username "@" domain
 username             =  *(unreserved)
 domain               =  *(unreserved)
+
+pidf-manipulation    =  "pidf-manipulation/users/sip:" username "@" domain

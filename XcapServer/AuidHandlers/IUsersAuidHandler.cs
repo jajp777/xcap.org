@@ -4,7 +4,7 @@ using Http.Message;
 
 namespace Server.Xcap
 {
-	interface IResourceListHandler
+	interface IUsersAuidHandler
 		: IAuidHandler
 	{
 		HttpMessageWriter ProcessGetItem(ByteArrayPart username, ByteArrayPart domain);
