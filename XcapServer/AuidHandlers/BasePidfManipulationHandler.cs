@@ -17,25 +17,14 @@ namespace Server.Xcap
 		{
 		}
 
-		//protected abstract byte[] GetPidf(ByteArrayPart username, ByteArrayPart domain);
-
-		//public HttpMessageWriter ProcessGetItem(ByteArrayPart username, ByteArrayPart domain)
-		//{
-		//    var pidf = GetPidf(username, domain);
-
-		//    return (pidf == null)
-		//        ? base.CreateResponse(StatusCodes.NotFound)
-		//        : base.CreateResponse(StatusCodes.OK, ContentType.ApplicationPidfXml, GetPidf(username, domain));
-		//}
-
 		public abstract HttpMessageWriter ProcessGetItem(ByteArrayPart username, ByteArrayPart domain);
 
-		public HttpMessageWriter ProcessPutItem(ByteArrayPart username, ByteArrayPart domain, ArraySegment<byte> content)
+		public virtual HttpMessageWriter ProcessPutItem(ByteArrayPart username, ByteArrayPart domain, HttpMessageReader reader, ArraySegment<byte> content)
 		{
 			return CreateErrorResponse(XcapErrors.CannotInsert, "Not Implemented");
 		}
 
-		public HttpMessageWriter ProcessDeleteItem(ByteArrayPart username, ByteArrayPart domain)
+		public virtual HttpMessageWriter ProcessDeleteItem(ByteArrayPart username, ByteArrayPart domain)
 		{
 			return CreateErrorResponse(XcapErrors.CannotDelete, "Not Implemented");
 		}

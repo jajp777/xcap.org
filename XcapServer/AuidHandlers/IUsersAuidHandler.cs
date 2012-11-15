@@ -8,7 +8,7 @@ namespace Server.Xcap
 		: IAuidHandler
 	{
 		HttpMessageWriter ProcessGetItem(ByteArrayPart username, ByteArrayPart domain);
-		HttpMessageWriter ProcessPutItem(ByteArrayPart username, ByteArrayPart domain, ArraySegment<byte> content);
+		HttpMessageWriter ProcessPutItem(ByteArrayPart username, ByteArrayPart domain, HttpMessageReader reader, ArraySegment<byte> content);
 		HttpMessageWriter ProcessDeleteItem(ByteArrayPart username, ByteArrayPart domain);
 	}
 }

@@ -162,7 +162,7 @@ namespace Server.Xcap
 								response = handler.ProcessGetItem(pathParser.Username, pathParser.Domain);
 								break;
 							case Methods.Put:
-								response = handler.ProcessPutItem(pathParser.Username, pathParser.Domain, httpContent);
+								response = handler.ProcessPutItem(pathParser.Username, pathParser.Domain, httpReader, httpContent);
 								break;
 							case Methods.Delete:
 								response = handler.ProcessDeleteItem(pathParser.Username, pathParser.Domain);

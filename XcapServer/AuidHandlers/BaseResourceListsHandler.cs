@@ -40,7 +40,7 @@ namespace Server.Xcap
 
 		public HttpMessageWriter ProcessGetItem(ByteArrayPart username, ByteArrayPart domain)
 		{
-			var writer = base.CreateNotFinishedResponse(ContentType.ApplicationResourceListsXml);
+			var writer = base.CreateNotFinishedResponse(StatusCodes.OK, ContentType.ApplicationResourceListsXml);
 
 			var content = CreateResourceList(GetEntries(username, domain));
 
@@ -51,7 +51,7 @@ namespace Server.Xcap
 			return writer;
 		}
 
-		public HttpMessageWriter ProcessPutItem(ByteArrayPart username, ByteArrayPart domain, ArraySegment<byte> content)
+		public HttpMessageWriter ProcessPutItem(ByteArrayPart username, ByteArrayPart domain, HttpMessageReader reader, ArraySegment<byte> content)
 		{
 			return CreateErrorResponse(XcapErrors.CannotInsert, "Not Implemented");
 		}

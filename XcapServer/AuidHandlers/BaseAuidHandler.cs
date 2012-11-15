@@ -23,11 +23,11 @@ namespace Server.Xcap
 		public string Segment2 { get; private set; }
 		public IAuidHandlerContext Context { get; set; }
 
-		protected HttpMessageWriter CreateNotFinishedResponse(ContentType contentType)
+		protected HttpMessageWriter CreateNotFinishedResponse(StatusCodes statusCode, ContentType contentType)
 		{
 			var writer = Context.GetWriter();
 
-			writer.WriteNotFinishedResponse(contentType);
+			writer.WriteNotFinishedResponse(statusCode, contentType);
 
 			return writer;
 		}
